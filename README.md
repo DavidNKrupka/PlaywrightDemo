@@ -1,2 +1,2 @@
 # PlaywrightDemo
-My path yto playwright
+My path to playwright
