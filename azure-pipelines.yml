@@ -13,20 +13,31 @@ variables:
   buildConfiguration: 'Release'
 
 steps:
-- task: NuGetToolInstaller@1
-
-- task: NuGetCommand@2
+- task: UseDotNet@2
   inputs:
-    restoreSolution: '$(solution)'
-
-- task: VSBuild@1
+    packageType: 'sdk'
+    version: '5.0.301'
+- task: DotNetCoreCLI@2
+  displayName: New Manifest for tool
   inputs:
-    solution: '$(solution)'
-    msbuildArgs: '/p:DeployOnBuild=true /p:WebPublishMethod=Package /p:PackageAsSingleFile=true /p:SkipInvalidConfigurations=true /p:PackageLocation="$(build.artifactStagingDirectory)"'
-    platform: '$(buildPlatform)'
-    configuration: '$(buildConfiguration)'
-
-- task: VSTest@2
+    command: custom
+    custom: 'new '
+    arguments: tool-manifest
+- task: DotNetCoreCLI@2
+  displayName: Install Playwright CLI
   inputs:
-    platform: '$(buildPlatform)'
-    configuration: '$(buildConfiguration)'
+    command: custom
+    custom: 'tool '
+    arguments: install Microsoft.Playwright.CLI
+- task: DotNetCoreCLI@2
+  inputs:
+    command: 'build'
+- task: DotNetCoreCLI@2
+  displayName: Run Playwright Install
+  inputs:
+    command: custom
+    custom: 'tool '
+    arguments: run playwright install
+- task: DotNetCoreCLI@2
+  inputs:
+    command: 'test'
