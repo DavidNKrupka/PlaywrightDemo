@@ -6,7 +6,6 @@
 trigger:
 - main
 
-
 pool:
   vmImage: ubuntu-latest
 
@@ -34,6 +33,7 @@ steps:
 - task: DotNetCoreCLI@2
   inputs:
     command: 'build'
+    projects: 'UnitTest1.cs'
 - task: DotNetCoreCLI@2
   displayName: Run Playwright Install
   inputs:
