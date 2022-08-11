@@ -33,7 +33,6 @@ steps:
 - task: DotNetCoreCLI@2
   inputs:
     command: 'build'
-    projects: '**/PlaywrightDemo/*.csproj'
 - task: DotNetCoreCLI@2
   displayName: Run Playwright Install
   inputs:
