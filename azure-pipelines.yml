@@ -43,8 +43,6 @@ steps:
     restoreSolution: '**/*.sln'
     feedsToUse: 'select'
     
-- pwsh: drop/tests/.playwright/node/win32_x64/playwright.cmd install
-  displayName: 'Install Playwright'
 - task: DotNetCoreCLI@2
   inputs:
     command: 'test'
