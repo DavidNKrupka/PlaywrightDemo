@@ -10,39 +10,40 @@ variables:
   solution: '**/UnitTest1.cs'
   project: '**/playwrightDemo.csproj'
 
-steps:
-- task: NuGetToolInstaller@1
-  name: 'NuGetToolInstaller'
-  displayName: 'NuGet Tool nuInstaller'
-
-- task: UseDotNet@2
-  inputs:
-    version: '6.0.x'
-    includePreviewVersions: true # Required for preview versions
-- task: UseDotNet@2
-  inputs:
-    version: '3.0.x'
-    packageType: runtime
-- task: DotNetCoreCLI@2
-  displayName: New Manifest for tool
-  inputs:
-    command: custom
-    custom: 'new '
-    arguments: tool-manifest
-- task: DotNetCoreCLI@2
-  displayName: Install Playwright CLI
-  inputs:
-    command: custom
-    custom: 'tool '
-    arguments: install Microsoft.Playwright.CLI
-- task: NuGetCommand@2
-  name: 'NuGetToolRestore' 
-  displayName: 'NuGet Tool Restore'
-  inputs:
-    command: 'restore'
-    restoreSolution: '**/*.sln'
-    feedsToUse: 'select'
-    
-- task: DotNetCoreCLI@2
-  inputs:
-    command: 'test'
+jobs:
+  - job: build
+    steps:
+    - checkout: self
+      clean: true
+    - task: UseDotNet@2
+      displayName: Install .Net 5
+      inputs:
+        packageType: "sdk"
+        version: "5.0.x"
+    - task: DotNetCoreCLI@2
+      displayName: Restore Packages
+      inputs:
+        command: 'restore'
+        projects: '**/playwrightDemo.csproj'
+        feedsToUse: 'config'
+        nugetConfigPath: 'nuget.config'
+    - task: DotNetCoreCLI@2
+      displayName: Build Projects
+      inputs:
+        command: 'build'
+        projects: '**/playwrightDemo.csproj'
+        arguments: '--no-restore -c Release /p:Platform=x64 /p:Version=$(Build.BuildNumber)'
+    - task: DotNetCoreCLI@2
+      displayName: Publish Test Project
+      condition: succeeded()
+      inputs:
+        command: 'publish'
+        publishWebProjects: false
+        projects: '$(testProject)'
+        arguments: '-c Release -o $(Build.ArtifactStagingDirectory)'
+        zipAfterPublish: false
+        modifyOutputPath: false
+        workingDirectory: '$(build.sourcesDirectory)'
+    - publish: $(Build.ArtifactStagingDirectory)
+      displayName: Publish Artifacts
+      artifact: drop
