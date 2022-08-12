@@ -2,12 +2,21 @@ trigger:
 - master
 
 pool:
-  vmImage: ubuntu-latest
+  vmImage: 'windows-latest'
 
 variables:
+  buildPlatform: 'Any CPU'
   buildConfiguration: 'Release'
+  solution: '**/UnitTest1.cs'
+  project: '**/playwrightDemo.csproj'
 
 steps:
+- task: NuGetToolInstaller@1
+  name: 'NuGetToolInstaller'
+  displayName: 'NuGet Tool nuInstaller'
+
+
+
 - task: UseDotNet@2
   inputs:
     version: '6.0.x'
@@ -28,10 +37,13 @@ steps:
     command: custom
     custom: 'tool '
     arguments: install Microsoft.Playwright.CLI
-- task: DotNetCoreCLI@2
+- task: NuGetCommand@2
+  name: 'NuGetToolRestore' 
+  displayName: 'NuGet Tool Restore'
   inputs:
     command: 'restore'
-    projects: '**/*.csproj'
+    restoreSolution: '**/*.sln'
+    feedsToUse: 'select'
 - task: DotNetCoreCLI@2
   displayName: Run Playwright Install
   inputs:
