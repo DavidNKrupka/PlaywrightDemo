@@ -15,8 +15,6 @@ steps:
   name: 'NuGetToolInstaller'
   displayName: 'NuGet Tool nuInstaller'
 
-
-
 - task: UseDotNet@2
   inputs:
     version: '6.0.x'
@@ -44,12 +42,9 @@ steps:
     command: 'restore'
     restoreSolution: '**/*.sln'
     feedsToUse: 'select'
-- task: DotNetCoreCLI@2
-  displayName: Run Playwright Install
-  inputs:
-    command: custom
-    custom: 'tool '
-    arguments: run playwright install
+    
+- pwsh: drop/tests/.playwright/node/win32_x64/playwright.cmd install
+  displayName: 'Install Playwright'
 - task: DotNetCoreCLI@2
   inputs:
     command: 'test'
