@@ -26,7 +26,8 @@ steps:
     arguments: install Microsoft.Playwright.CLI
 - task: DotNetCoreCLI@2
   inputs:
-    command: 'test'
+    command: 'restore'
+    projects: '**/*.csproj'
 - task: DotNetCoreCLI@2
   displayName: Run Playwright Install
   inputs:
