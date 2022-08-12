@@ -11,34 +11,6 @@ variables:
   project: '**/playwrightDemo.csproj'
 
 steps:
-- task: NuGetToolInstaller@1
-  name: 'NuGetToolInstaller'
-  displayName: 'NuGet Tool nuInstaller'
+- pwsh: drop/tests/.playwright/node/win32_x64/playwright.cmd install
+  displayName: 'Install Playwright'
 
-- task: UseDotNet@2
-  inputs:
-    version: '6.0.x'
-    includePreviewVersions: true # Required for preview versions
-- task: DotNetCoreCLI@2
-  displayName: New Manifest for tool
-  inputs:
-    command: custom
-    custom: 'new '
-    arguments: tool-manifest
-- task: DotNetCoreCLI@2
-  displayName: Install Playwright CLI
-  inputs:
-    command: custom
-    custom: 'tool '
-    arguments: install Microsoft.Playwright.CLI
-- task: NuGetCommand@2
-  name: 'NuGetToolRestore' 
-  displayName: 'NuGet Tool Restore'
-  inputs:
-    command: 'restore'
-    restoreSolution: '**/*.sln'
-    feedsToUse: 'select'
-- task: DotNetCoreCLI@2
-  inputs:
-    command: 'build' 
-    projects: 'playwrightDemo/playwrightDemo.csproj'
