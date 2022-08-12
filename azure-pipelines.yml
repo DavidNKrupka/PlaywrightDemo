@@ -38,7 +38,7 @@ steps:
     command: 'restore'
     restoreSolution: '**/*.sln'
     feedsToUse: 'select'
-    
 - task: DotNetCoreCLI@2
   inputs:
-    command: 'test'
+    command: 'build' 
+    projects: 'playwrightDemo/playwrightDemo.csproj'
