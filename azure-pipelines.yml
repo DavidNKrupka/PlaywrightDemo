@@ -1,53 +1,38 @@
-# ASP.NET
-# Build and test ASP.NET projects.
-# Add steps that publish symbols, save build artifacts, deploy, and more:
-# https://docs.microsoft.com/azure/devops/pipelines/apps/aspnet/build-aspnet-4
-
 trigger:
-- main
+- master
 
 pool:
   vmImage: ubuntu-latest
 
-
 variables:
   buildConfiguration: 'Release'
 
- 
-jobs:
-  - job: build
-    steps:
-    - checkout: self
-      clean: true
-    - task: UseDotNet@2
-      displayName: Install .Net 5
-      inputs:
-        packageType: "sdk"
-        version: "5.0.x"
-    - task: DotNetCoreCLI@2
-      displayName: Restore Packages
-      inputs:
-        command: 'restore'
-        projects: 'tests/tests.csproj'
-        feedsToUse: 'config'
-        nugetConfigPath: 'nuget.config'
-    - task: DotNetCoreCLI@2
-      displayName: Build Projects
-      inputs:
-        command: 'build'
-        projects: 'tests/tests.csproj'
-        arguments: '--no-restore -c Release /p:Platform=x64 /p:Version=$(Build.BuildNumber)'
-    - task: DotNetCoreCLI@2
-      displayName: Publish Test Project
-      condition: succeeded()
-      inputs:
-        command: 'publish'
-        publishWebProjects: false
-        projects: '$(testProject)'
-        arguments: '-c Release -o $(Build.ArtifactStagingDirectory)'
-        zipAfterPublish: false
-        modifyOutputPath: false
-        workingDirectory: '$(build.sourcesDirectory)'
-    - publish: $(Build.ArtifactStagingDirectory)
-      displayName: Publish Artifacts
-      artifact: drop
+steps:
+- task: UseDotNet@2
+  inputs:
+    packageType: 'sdk'
+    version: '5.0.301'
+- task: DotNetCoreCLI@2
+  displayName: New Manifest for tool
+  inputs:
+    command: custom
+    custom: 'new '
+    arguments: tool-manifest
+- task: DotNetCoreCLI@2
+  displayName: Install Playwright CLI
+  inputs:
+    command: custom
+    custom: 'tool '
+    arguments: install Microsoft.Playwright.CLI
+- task: DotNetCoreCLI@2
+  inputs:
+    command: 'test'
+- task: DotNetCoreCLI@2
+  displayName: Run Playwright Install
+  inputs:
+    command: custom
+    custom: 'tool '
+    arguments: run playwright install
+- task: DotNetCoreCLI@2
+  inputs:
+    command: 'test'
